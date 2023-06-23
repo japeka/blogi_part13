@@ -21,7 +21,6 @@ const blogFinder = async (req, res, next) => {
     } 
   })
 
-  //api/blogs
   router.delete('/:id',blogFinder, async (req, res) => {
     try {
       if(req.blog) { 
@@ -35,5 +34,16 @@ const blogFinder = async (req, res, next) => {
       return res.status(400).json({error})        
     }
 })
+
+router.put('/:id',blogFinder, async (req, res) => {
+    if (req.blog) {
+      req.blog.likes = req.body.likes
+      await req.blog.save()
+      res.json(req.blog)
+    } else {
+      res.status(404).end()
+    }
+  })
+  
 
 module.exports = router
