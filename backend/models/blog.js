@@ -1,28 +1,35 @@
-const mongoose = require('mongoose')
+const { Model, DataTypes } = require('sequelize')
+const { sequelize } = require('../util/db')
 
-const schema = mongoose.Schema({
-  title: { 
-    type: String,
-    required: true
-  },
-  author: { 
-    type: String,
-    required: true
-  },
-  url: String,
-  likes: Number,
-  user: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User'
-  }
-})
+class Blog extends Model {}
 
-schema.set('toJSON', {
-  transform: (document, returnedObject) => {
-    returnedObject.id = returnedObject._id.toString()
-    delete returnedObject._id
-    delete returnedObject.__v
-  }
-})
+Blog.init({
+    id: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true
+    },
+    author: {
+      type: DataTypes.TEXT,
+      allowNull: true
+    },
+    url: {
+        type: DataTypes.TEXT,
+        allowNull: false
+    },
+    title: {
+        type: DataTypes.TEXT,
+        allowNull: false
+    },
+    likes: {
+      type: DataTypes.INTEGER,
+      defaultValue: 0
+    }
+  }, {
+    sequelize,
+    underscored: true,
+    timestamps: false,
+    modelName: 'blog'
+  })
 
-module.exports = mongoose.model('Blog', schema)
+  module.exports = Blog
