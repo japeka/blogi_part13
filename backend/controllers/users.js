@@ -9,19 +9,14 @@ const userFinder = async (req, res, next) => {
     next()
   }
   
-
 router.get('/', async (req, res) => {
   const users = await User.findAll()
   res.json(users)
 })
 
 router.post('/', async (req, res) => {
-    try {
-      const user = await User.create(req.body)
-      res.json(user)
-    } catch(error) {
-      return res.status(400).json({ error })
-    }
+    const user = await User.create(req.body)
+    res.status(201).json(user)
 })
 
 router.put('/:username', userFinder, async (req, res) => {

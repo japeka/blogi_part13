@@ -17,7 +17,6 @@ app.use(middleware.errorHandler)
 
 const start = async () => {
   await connectToDatabase()
-  console.log('testing')
   app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`)
   })
