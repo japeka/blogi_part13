@@ -26,7 +26,7 @@ const blogFinder = async (req, res, next) => {
     next()
   }
   
-  router.get('/', async (req, res) => {
+router.get('/', async (req, res) => {
     const blogs = await Blog.findAll()
     res.json(blogs)
   })
@@ -37,13 +37,17 @@ router.post('/', tokenExtractor, async (req, res) => {
     res.status(201).json(blog)
   })
 
-router.delete('/:id',blogFinder, async (req, res) => {
-      if(req.blog) { 
-        await req.blog.destroy() 
-      } else { 
-        console.log("Blog not found")
-        return res.status(404).json({error: 'Resource not found'})
-      }
+router.delete('/:id',tokenExtractor, blogFinder, async (req, res) => {
+   if(req.decodedToken.id && req.blog) { 
+        if(req.decodedToken.id === req.blog.userId) { 
+          await req.blog.destroy() 
+          return res.status(204).end()
+        } else {
+          return res.status(404).json({error: 'User cannot delete the blog as user is not owner of the blog'})
+        }
+   } else { 
+     return res.status(404).json({error: 'Resource not found'})
+   }
 })
 
 router.put('/:id',blogFinder, async (req, res) => {
