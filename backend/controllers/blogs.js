@@ -46,7 +46,7 @@ router.delete('/:id',tokenExtractor, blogFinder, async (req, res) => {
           return res.status(404).json({error: 'User cannot delete the blog as user is not owner of the blog'})
         }
    } else { 
-     return res.status(404).json({error: 'Resource not found'})
+     return res.status(404).json({error: 'Resource or token not found'})
    }
 })
 
