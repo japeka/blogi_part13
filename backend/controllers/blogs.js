@@ -29,10 +29,21 @@ const blogFinder = async (req, res, next) => {
   
 router.get('/', async (req, res) => {
 
-    const where = {}
+    let where = {}
     if(req.query.search) {
-      where.title = {
-        [Op.iLike]: `%${req.query.search}%`
+      where = {
+        [Op.or]:[
+        {
+          title: {
+            [Op.iLike]: `%${req.query.search}%`
+          }
+        },
+        {
+          author: {
+            [Op.iLike]: `%${req.query.search}%`
+          }
+        }
+        ]
       }
     }
   
@@ -46,6 +57,7 @@ router.get('/', async (req, res) => {
     })
     res.json(blogs)
   })
+  
 
 router.post('/', tokenExtractor, async (req, res) => {
     const user = await User.findByPk(req.decodedToken.id)
