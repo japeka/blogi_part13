@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "nodemon index.js",
+    "migration:down": "node util/rollback.js",
     "cli": "nodemon cli.js",
     "test": "jest --runInBand"
   },
@@ -21,7 +22,8 @@
     "mongoose": "^6.8.4",
     "mongoose-unique-validator": "^3.1.0",
     "pg": "^8.11.0",
-    "sequelize": "^6.32.1"
+    "sequelize": "^6.32.1",
+    "umzug": "^3.2.1"
   },
   "devDependencies": {
     "jest": "^29.3.1",
