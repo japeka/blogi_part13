@@ -1,3 +1,6 @@
+const jwt = require('jsonwebtoken')
+const { SECRET } = require('./config')
+
 const errorHandler = (error, request, response, next) => {
     if (error.name === 'CastError') {
       return response.status(400).send({ error: 'malformatted id' })

@@ -1,8 +1,6 @@
-const jwt = require('jsonwebtoken')
 const router = require('express').Router()
 
 const { Op } = require('sequelize')
-const { SECRET } = require('../util/config')
 const { tokenExtractor } = require('../util/middleware')
 
 const { Blog, User } = require('../models')
@@ -47,6 +45,8 @@ router.get('/', async (req, res) => {
 
 router.post('/', tokenExtractor, async (req, res) => {
     const user = await User.findByPk(req.decodedToken.id)
+    console.log('user', user)
+    console.log('req.body', req.body)
     const blog = await Blog.create({...req.body, userId: user.id})
     res.status(201).json(blog)
   })
