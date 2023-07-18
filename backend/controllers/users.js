@@ -1,8 +1,5 @@
 const router = require('express').Router()
 
-const { Op } = require('sequelize')
-
-
 const { User, Blog } = require('../models')
 
 const userFinder = async (req, res, next) => {
