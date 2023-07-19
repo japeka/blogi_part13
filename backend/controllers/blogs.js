@@ -2,16 +2,26 @@ const router = require('express').Router()
 
 const { Op } = require('sequelize')
 const { tokenExtractor } = require('../util/middleware')
-
-const { Blog, User } = require('../models')
+const { Blog, User, Session } = require('../models')
 
 const blogFinder = async (req, res, next) => {
     req.blog = await Blog.findByPk(req.params.id)
     next()
   }
+
+  const tokenValidator = async (req, res, next) => {
+    req.session = await Session.findOne({
+      where: {
+        [Op.and]: [{
+          userId: req.decodedToken.id
+        },{
+          sessionId: req.decodedToken.token
+        }]
+    }})
+    next()
+  }
   
 router.get('/', async (req, res) => {
-
     let where = {}
     if(req.query.search) {
       where = {
@@ -41,24 +51,35 @@ router.get('/', async (req, res) => {
     })
     res.json(blogs)
   })
-  
 
-router.post('/', tokenExtractor, async (req, res) => {
+  router.post('/', tokenExtractor, tokenValidator, async (req, res) => {
     const user = await User.findByPk(req.decodedToken.id)
-    console.log('user', user)
-    console.log('req.body', req.body)
-    const blog = await Blog.create({...req.body, userId: user.id})
-    res.status(201).json(blog)
+    if(req.session) {
+      const currentTokenExpire = new Date().getTime()
+      if(currentTokenExpire <= req.session.sessionExpire) {
+        const blog = await Blog.create({...req.body, userId: user.id})
+        res.status(201).json(blog)
+      } else {  
+        res.status(201).json({error: 'token expired'})
+      }
+    } else {
+      res.status(201).json({error: 'token not found'})
+    }
   })
 
-router.delete('/:id',tokenExtractor, blogFinder, async (req, res) => {
-   if(req.decodedToken.id && req.blog) { 
+  router.delete('/:id',tokenExtractor, tokenValidator, blogFinder, async (req, res) => {
+   if(req.decodedToken.id && req.session && req.blog) {
+      const currentTokenExpire = new Date().getTime()
+      if(currentTokenExpire <= req.session.sessionExpire) {
         if(req.decodedToken.id === req.blog.userId) { 
           await req.blog.destroy() 
           return res.status(204).end()
         } else {
           return res.status(404).json({error: 'User cannot delete the blog as user is not owner of the blog'})
         }
+      } else {
+        return res.status(404).json({error: 'Token expired'})
+      }
    } else { 
      return res.status(404).json({error: 'Resource or token not found'})
    }

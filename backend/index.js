@@ -7,6 +7,7 @@ const usersRouter = require('./controllers/users')
 const readingListsRouter = require('./controllers/readinglists')
 const authorsRouter = require('./controllers/authors')
 const loginRouter = require('./controllers/login')
+const logoutRouter = require('./controllers/logout')
 
 const middleware = require('./util/middleware')
 
@@ -18,7 +19,7 @@ app.use('/api/users', usersRouter)
 app.use('/api/readinglists', readingListsRouter)
 app.use('/api/authors', authorsRouter)
 app.use('/api/login', loginRouter)
-
+app.use('/api/logout', logoutRouter)
 
 app.use(middleware.errorHandler)
 
